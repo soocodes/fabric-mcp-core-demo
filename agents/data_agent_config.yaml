@@ -1,0 +1,37 @@
+# Data Agent configuration — Retail Demo (Fabric Data Agent, preview)
+# This config documents the data sources, example questions, and grounding
+# instructions for a Fabric Data Agent. Provision with agents/data_agent_setup.ipynb
+# (fabric-data-agent SDK) or the Fabric portal (Data Science > Data agent).
+
+name: RetailDataAgent
+description: >
+  Answers natural-language business questions about the Canadian retail demo
+  using the RetailSalesModel semantic model and the RetailLakehouse tables.
+
+dataSources:
+  - type: SemanticModel
+    name: RetailSalesModel
+    notes: Primary source. Use measures (Total Sales, Avg Order Value, Inventory On Hand, Low Stock Items).
+  - type: Lakehouse
+    name: RetailLakehouse
+    tables: [stores, products, customers, orders, inventory, events]
+
+instructions: |
+  You are a retail analytics assistant. Prefer semantic-model measures over raw
+  aggregations. Currency is CAD. When asked about "low inventory", compare
+  inventory.on_hand to inventory.reorder_threshold. When asked about "top" items,
+  sort by Total Sales descending unless the user specifies another metric.
+
+exampleQuestions:
+  - What are the top-selling products?
+  - Which store has the highest revenue?
+  - Which products are low in inventory?
+  - What is the average order value by channel?
+  - How many orders came from Online vs In-Store?
+  - Which category drives the most sales?
+
+# Ground-truth hints the agent can rely on (helps evaluation/demo):
+groundTruth:
+  topMetric: Total Sales
+  lowStockRule: "inventory.on_hand < inventory.reorder_threshold"
+  channels: [Online, In-Store]

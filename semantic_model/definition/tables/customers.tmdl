@@ -1,0 +1,49 @@
+table customers
+	lineageTag: tbl-customers-0001
+
+	column customer_id
+		dataType: string
+		lineageTag: col-customers-customer_id
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column name
+		dataType: string
+		lineageTag: col-customers-name
+		summarizeBy: none
+		sourceColumn: name
+
+	column city
+		dataType: string
+		lineageTag: col-customers-city
+		summarizeBy: none
+		sourceColumn: city
+
+	column province
+		dataType: string
+		lineageTag: col-customers-province
+		summarizeBy: none
+		sourceColumn: province
+
+	column segment
+		dataType: string
+		lineageTag: col-customers-segment
+		summarizeBy: none
+		sourceColumn: segment
+
+	column signup_date
+		dataType: string
+		lineageTag: col-customers-signup_date
+		summarizeBy: none
+		sourceColumn: signup_date
+
+	measure 'Customer Count' = DISTINCTCOUNT(customers[customer_id])
+		formatString: #,0
+		lineageTag: m-customers-count
+
+	partition customers = entity
+		mode: directLake
+		source
+			entityName: customers
+			schemaName: dbo
+			expressionSource: DatabaseQuery

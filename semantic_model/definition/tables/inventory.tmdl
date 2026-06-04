@@ -1,0 +1,53 @@
+table inventory
+	lineageTag: tbl-inventory-0001
+
+	column store_id
+		dataType: string
+		lineageTag: col-inventory-store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column product_id
+		dataType: string
+		lineageTag: col-inventory-product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column on_hand
+		dataType: int64
+		lineageTag: col-inventory-on_hand
+		summarizeBy: sum
+		sourceColumn: on_hand
+		formatString: #,0
+
+	column reorder_threshold
+		dataType: int64
+		lineageTag: col-inventory-reorder_threshold
+		summarizeBy: none
+		sourceColumn: reorder_threshold
+		formatString: #,0
+
+	column updated_at
+		dataType: string
+		lineageTag: col-inventory-updated_at
+		summarizeBy: none
+		sourceColumn: updated_at
+
+	measure 'Inventory On Hand' = SUM(inventory[on_hand])
+		formatString: #,0
+		lineageTag: m-inventory-onhand
+
+	measure 'Low Stock Items' = CALCULATE(COUNTROWS(inventory), FILTER(inventory, inventory[on_hand] < inventory[reorder_threshold]))
+		formatString: #,0
+		lineageTag: m-inventory-lowstock
+
+	measure 'Inventory Health %' = DIVIDE(CALCULATE(COUNTROWS(inventory), FILTER(inventory, inventory[on_hand] >= inventory[reorder_threshold])), COUNTROWS(inventory))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: m-inventory-health
+
+	partition inventory = entity
+		mode: directLake
+		source
+			entityName: inventory
+			schemaName: dbo
+			expressionSource: DatabaseQuery

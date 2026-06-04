@@ -1,0 +1,25 @@
+{
+  "workspaceId": "<YOUR-FABRIC-WORKSPACE-ID>",
+  "workspaceName": "<your-workspace-name>",
+  "names": {
+    "lakehouse": "RetailLakehouse",
+    "loadNotebook": "Retail_LoadData",
+    "eventhouse": "RetailEventhouse",
+    "kqlDatabase": "RetailEvents",
+    "semanticModel": "RetailSalesModel",
+    "report": "RetailDemoReport",
+    "activator": "LowInventoryActivator"
+  },
+  "thresholds": {
+    "lowStock": 15,
+    "salesSpikeUnits": 25
+  },
+  "data": {
+    "stores": 4,
+    "products": 30,
+    "customers": 80,
+    "orders": 350,
+    "events": 40,
+    "seed": 42
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$comment": "Fabric IQ — Retail ontology (preview). Defines business entities, their properties, key bindings to Lakehouse Delta tables, and relationships. Use this as the source spec when authoring the Ontology item in the Fabric IQ portal (Ontology > Entity types / Relationships). Property->column bindings map 1:1 to the Lakehouse tables created by notebooks/01_load_data.ipynb.",
+  "name": "RetailOntology",
+  "description": "Canadian retail domain model for the Fabric IQ demo.",
+  "dataSource": {
+    "type": "Lakehouse",
+    "lakehouseName": "RetailLakehouse"
+  },
+  "entityTypes": [
+    {
+      "name": "Store",
+      "key": "store_id",
+      "sourceTable": "stores",
+      "properties": [
+        { "name": "store_id", "type": "string", "column": "store_id" },
+        { "name": "name", "type": "string", "column": "name" },
+        { "name": "city", "type": "string", "column": "city" },
+        { "name": "province", "type": "string", "column": "province" },
+        { "name": "type", "type": "string", "column": "type" }
+      ]
+    },
+    {
+      "name": "Product",
+      "key": "product_id",
+      "sourceTable": "products",
+      "properties": [
+        { "name": "product_id", "type": "string", "column": "product_id" },
+        { "name": "name", "type": "string", "column": "name" },
+        { "name": "category", "type": "string", "column": "category" },
+        { "name": "unit_price", "type": "double", "column": "unit_price" }
+      ]
+    },
+    {
+      "name": "Customer",
+      "key": "customer_id",
+      "sourceTable": "customers",
+      "properties": [
+        { "name": "customer_id", "type": "string", "column": "customer_id" },
+        { "name": "name", "type": "string", "column": "name" },
+        { "name": "segment", "type": "string", "column": "segment" },
+        { "name": "province", "type": "string", "column": "province" }
+      ]
+    },
+    {
+      "name": "Order",
+      "key": "order_id",
+      "sourceTable": "orders",
+      "properties": [
+        { "name": "order_id", "type": "string", "column": "order_id" },
+        { "name": "qty", "type": "integer", "column": "qty" },
+        { "name": "amount", "type": "double", "column": "amount" },
+        { "name": "channel", "type": "string", "column": "channel" },
+        { "name": "order_date", "type": "string", "column": "order_date" }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "key": ["store_id", "product_id"],
+      "sourceTable": "inventory",
+      "properties": [
+        { "name": "store_id", "type": "string", "column": "store_id" },
+        { "name": "product_id", "type": "string", "column": "product_id" },
+        { "name": "on_hand", "type": "integer", "column": "on_hand" },
+        { "name": "reorder_threshold", "type": "integer", "column": "reorder_threshold" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "name": "PlacesOrder",   "from": "Customer",  "to": "Order",     "cardinality": "1:N", "fromKey": "customer_id", "toKey": "customer_id" },
+    { "name": "OrderContains", "from": "Order",     "to": "Product",   "cardinality": "N:1", "fromKey": "product_id",  "toKey": "product_id" },
+    { "name": "OrderAtStore",  "from": "Order",     "to": "Store",     "cardinality": "N:1", "fromKey": "store_id",    "toKey": "store_id" },
+    { "name": "ProductHasInventory", "from": "Product", "to": "Inventory", "cardinality": "1:N", "fromKey": "product_id", "toKey": "product_id" },
+    { "name": "StoreHoldsInventory", "from": "Store",   "to": "Inventory", "cardinality": "1:N", "fromKey": "store_id",   "toKey": "store_id" }
+  ]
+}

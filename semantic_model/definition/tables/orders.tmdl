@@ -1,0 +1,75 @@
+table orders
+	lineageTag: tbl-orders-0001
+
+	column order_id
+		dataType: string
+		lineageTag: col-orders-order_id
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column customer_id
+		dataType: string
+		lineageTag: col-orders-customer_id
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column store_id
+		dataType: string
+		lineageTag: col-orders-store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column product_id
+		dataType: string
+		lineageTag: col-orders-product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column qty
+		dataType: int64
+		lineageTag: col-orders-qty
+		summarizeBy: sum
+		sourceColumn: qty
+		formatString: 0
+
+	column order_date
+		dataType: string
+		lineageTag: col-orders-order_date
+		summarizeBy: none
+		sourceColumn: order_date
+
+	column channel
+		dataType: string
+		lineageTag: col-orders-channel
+		summarizeBy: none
+		sourceColumn: channel
+
+	column amount
+		dataType: double
+		lineageTag: col-orders-amount
+		summarizeBy: sum
+		sourceColumn: amount
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Total Sales' = SUM(orders[amount])
+		formatString: \$#,0.00
+		lineageTag: m-orders-totalsales
+
+	measure 'Total Orders' = DISTINCTCOUNT(orders[order_id])
+		formatString: #,0
+		lineageTag: m-orders-totalorders
+
+	measure 'Units Sold' = SUM(orders[qty])
+		formatString: #,0
+		lineageTag: m-orders-unitssold
+
+	measure 'Avg Order Value' = DIVIDE([Total Sales], [Total Orders])
+		formatString: \$#,0.00
+		lineageTag: m-orders-aov
+
+	partition orders = entity
+		mode: directLake
+		source
+			entityName: orders
+			schemaName: dbo
+			expressionSource: DatabaseQuery

@@ -1,0 +1,36 @@
+// setup.kql — Retail Eventhouse (KQL Database: RetailEvents)
+// Run this script against the KQL database to create the streaming-style events
+// table and seed a few sample events. The deploy script executes it via the
+// Kusto management endpoint of the Eventhouse query URI.
+
+// 1) Events table — aligns with Lakehouse `events` / `inventory` entities
+.create-merge table InventoryEvents (
+    event_time: datetime,
+    store_id: string,
+    product_id: string,
+    event_type: string,   // LowStock | StockOut | SalesSpike | Restock
+    severity: string,     // High | Medium | Low
+    on_hand: int,
+    threshold: int,
+    message: string
+)
+
+// 2) Update policy / retention kept default for the demo (small data)
+
+// 3) Seed sample events (low inventory + sales spikes)
+.set-or-append InventoryEvents <|
+    datatable(event_time:datetime, store_id:string, product_id:string, event_type:string, severity:string, on_hand:int, threshold:int, message:string)
+    [
+        datetime(2026-05-30T14:05:00Z), "S002", "P004", "LowStock",   "Medium", 8,  15, "P004 at S002 below reorder threshold",
+        datetime(2026-05-31T09:22:00Z), "S003", "P011", "StockOut",   "High",   0,  15, "P011 at S003 is out of stock",
+        datetime(2026-05-31T17:48:00Z), "S001", "P020", "SalesSpike", "Low",    140,15, "High online demand for P020",
+        datetime(2026-06-01T08:10:00Z), "S004", "P007", "LowStock",   "Medium", 5,  15, "P007 at S004 below reorder threshold",
+        datetime(2026-06-01T11:33:00Z), "S002", "P015", "SalesSpike", "Low",    95, 15, "Demand spike for P015 at S002",
+        datetime(2026-06-01T12:40:00Z), "S003", "P002", "StockOut",   "High",   0,  15, "P002 at S003 is out of stock"
+    ]
+
+// 4) Demo queries
+// Low-stock / stock-out events in the last 7 days:
+//   InventoryEvents | where event_type in ('LowStock','StockOut') | where event_time > ago(7d)
+// Count by store and severity:
+//   InventoryEvents | summarize count() by store_id, severity

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Retail Fabric IQ Demo — Maple &amp; Pine</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121a30; --panel2:#0e1528; --ink:#e9eefb; --muted:#9aa6c4;
+    --line:#243154; --brand:#3aa0ff; --brand2:#7c5cff; --teal:#22d3ee; --green:#34d399;
+    --amber:#fbbf24; --red:#fb7185; --chip:#1b2742;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;font-family:'Segoe UI',Roboto,system-ui,Arial,sans-serif;background:
+    radial-gradient(1200px 600px at 80% -10%, #16224a 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, #1a1340 0%, transparent 55%), var(--bg);
+    color:var(--ink);line-height:1.55;
+  }
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header.hero{
+    padding:54px 24px 30px;text-align:center;position:relative;overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .badge{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--teal);background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);
+    padding:6px 14px;border-radius:999px;margin-bottom:18px}
+  .hero h1{font-size:clamp(28px,5vw,46px);margin:.1em 0;
+    background:linear-gradient(90deg,#7c5cff,#3aa0ff 45%,#22d3ee);
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+  .hero p.sub{color:var(--muted);max-width:760px;margin:10px auto 0;font-size:18px}
+  .hero .meta{margin-top:18px;color:var(--muted);font-size:13px}
+  .hero .meta code{background:var(--chip);padding:3px 8px;border-radius:6px;color:#cdd8f5}
+  nav.tabs{
+    position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+    padding:12px;background:rgba(11,16,32,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)
+  }
+  nav.tabs button{
+    background:transparent;border:1px solid transparent;color:var(--muted);font-size:14px;font-weight:600;
+    padding:9px 16px;border-radius:10px;cursor:pointer;transition:.15s
+  }
+  nav.tabs button:hover{color:var(--ink);background:var(--chip)}
+  nav.tabs button.active{color:#fff;background:linear-gradient(90deg,var(--brand2),var(--brand));box-shadow:var(--shadow)}
+  main{max-width:1080px;margin:0 auto;padding:34px 22px 80px}
+  section.tab{display:none;animation:fade .35s ease}
+  section.tab.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  h2.section{font-size:26px;margin:0 0 6px;font-weight:800}
+  .lead{color:var(--muted);font-size:17px;margin:0 0 22px;max-width:820px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:16px;padding:22px;box-shadow:var(--shadow);margin:16px 0}
+  .grid{display:grid;gap:16px}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:820px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+  .kpi .num{font-size:30px;font-weight:800;letter-spacing:.5px}
+  .kpi .num.g{color:var(--green)} .kpi .num.b{color:var(--brand)} .kpi .num.v{color:var(--brand2)} .kpi .num.t{color:var(--teal)}
+  .kpi .lab{color:var(--muted);font-size:13px;margin-top:4px}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:14.5px;overflow:hidden;border-radius:12px}
+  th,td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--chip);color:#cdd8f5;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+  tbody tr:hover{background:rgba(58,160,255,.05)}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+  .pill.ok{color:#062;background:#bbf7d0} .pill.warn{color:#7a3e00;background:#fde68a}
+  .pill.info{color:#03344a;background:#a5f3fc} .pill.prev{color:#3b0764;background:#e9d5ff}
+  ul.clean{list-style:none;padding-left:0;margin:0}
+  ul.clean li{padding:7px 0 7px 28px;position:relative;border-bottom:1px dashed var(--line)}
+  ul.clean li:last-child{border-bottom:none}
+  ul.clean li:before{content:"▸";position:absolute;left:6px;color:var(--brand)}
+  .act{border-left:3px solid var(--brand2);padding:4px 0 4px 18px;margin:18px 0}
+  .act h4{margin:0 0 4px;font-size:18px;color:#fff}
+  .act .who{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--teal)}
+  .steps{counter-reset:step}
+  .steps .step{position:relative;padding:16px 16px 16px 64px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);margin:12px 0}
+  .steps .step:before{counter-increment:step;content:counter(step);position:absolute;left:16px;top:16px;
+    width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,var(--brand2),var(--brand))}
+  .steps .step h4{margin:0 0 6px;font-size:16px}
+  code,pre{font-family:'Cascadia Code',Consolas,Monaco,monospace}
+  pre{background:#070b18;border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:auto;
+    font-size:13px;color:#d6e2ff}
+  code.inline{background:var(--chip);padding:2px 7px;border-radius:6px;font-size:13px;color:#bcd0ff}
+  .callout{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid;font-size:14.5px}
+  .callout.tip{border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.07)}
+  .callout.note{border-color:rgba(58,160,255,.4);background:rgba(58,160,255,.07)}
+  .callout.warn{border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+  .callout b{color:#fff}
+  /* mock visuals */
+  .viz{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .viz h5{margin:0 0 12px;font-size:14px;color:var(--muted);font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+  .bars{display:flex;align-items:flex-end;gap:14px;height:160px;padding-top:8px}
+  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}
+  .bar .col{width:70%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--brand),var(--brand2));transition:height 1s ease}
+  .bar small{color:var(--muted);font-size:12px}
+  .bar b{font-size:12px;color:#cdd8f5}
+  .donut{display:flex;align-items:center;gap:18px}
+  .ring{width:130px;height:130px;border-radius:50%;
+    background:conic-gradient(var(--brand) 0 62%, var(--teal) 62% 100%);position:relative;flex:none}
+  .ring:after{content:"";position:absolute;inset:18px;border-radius:50%;background:var(--panel)}
+  .ring span{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:20px}
+  .legend{font-size:13px;color:var(--muted)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:middle}
+  .hbars .row{display:grid;grid-template-columns:130px 1fr 56px;align-items:center;gap:10px;margin:9px 0}
+  .hbars .track{height:18px;border-radius:9px;background:var(--chip);overflow:hidden}
+  .hbars .fill{height:100%;border-radius:9px;background:linear-gradient(90deg,var(--teal),var(--brand))}
+  .hbars small{color:var(--muted);font-size:13px}
+  .hbars b{font-size:13px;text-align:right;color:#cdd8f5}
+  /* ontology graph */
+  .graph{position:relative;height:330px;border-radius:14px;background:
+    radial-gradient(600px 300px at 50% 40%, rgba(124,92,255,.10), transparent 70%);border:1px solid var(--line)}
+  .node{position:absolute;transform:translate(-50%,-50%);background:var(--panel);border:1.5px solid var(--brand);
+    color:#fff;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;box-shadow:var(--shadow);white-space:nowrap}
+  .node.alt{border-color:var(--teal)} .node.warn{border-color:var(--amber)}
+  .edge{position:absolute;font-size:11px;color:var(--teal);background:rgba(11,16,32,.7);padding:1px 7px;border-radius:6px;transform:translate(-50%,-50%)}
+  svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  svg.lines line{stroke:var(--line);stroke-width:2}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .flow .box{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:#cdd8f5;font-weight:600}
+  .flow .arr{color:var(--brand)}
+  footer{border-top:1px solid var(--line);padding:26px;text-align:center;color:var(--muted);font-size:13px}
+  .toolbar{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+  .btn{background:var(--chip);border:1px solid var(--line);color:var(--ink);padding:9px 16px;border-radius:10px;
+    cursor:pointer;font-weight:600;font-size:14px}
+  .btn.primary{background:linear-gradient(90deg,var(--brand2),var(--brand));border:none}
+  .btn:hover{filter:brightness(1.1)}
+  @media print{nav.tabs{display:none}section.tab{display:block!important}.btn{display:none}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="badge">Microsoft Fabric IQ · Retail Accelerator</div>
+  <h1>Maple &amp; Pine — Retail Fabric IQ Demo</h1>
+  <p class="sub">One copy of data powering a Power BI report, a conversational Data Agent, a living business
+  ontology, and a real-time inventory Activator — an end-to-end <b>Fabric IQ</b> story you can deploy in your own tenant.</p>
+  <div class="meta">Deploys into <b>your own</b> Fabric workspace &nbsp;·&nbsp; Canadian retail scenario &nbsp;·&nbsp; 4 stores · 30 products · 350 orders</div>
+  <div class="toolbar">
+    <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="btn" onclick="go('deploy')">🚀 Jump to Deployment Guide</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="exec" class="active">Executive Summary</button>
+  <button data-tab="value">Business Value</button>
+  <button data-tab="arch">Architecture</button>
+  <button data-tab="story">Demo Storyline</button>
+  <button data-tab="visuals">Sample Visuals</button>
+  <button data-tab="deploy">Deployment Guide</button>
+  <button data-tab="manual">Finish &amp; Run</button>
+</nav>
+
+<main>
+
+<!-- ===================== EXEC SUMMARY ===================== -->
+<section id="exec" class="tab active">
+  <h2 class="section">Executive Summary</h2>
+  <p class="lead">A mid-size Canadian retailer, <b>Maple &amp; Pine</b>, runs 4 regional stores plus an online
+  channel. Sales are healthy — but teams work in silos: analysts build reports, ops chase stock-outs by hand,
+  and leaders wait days for answers. This demo shows how <b>Microsoft Fabric IQ</b> unifies that into a single,
+  governed, AI-ready foundation on <b>one copy of the data</b>.</p>
+
+  <div class="grid cols-4">
+    <div class="kpi"><div class="num g">$106K</div><div class="lab">Total sales (verified, Direct Lake)</div></div>
+    <div class="kpi"><div class="num b">350</div><div class="lab">Orders across 4 stores + online</div></div>
+    <div class="kpi"><div class="num v">5</div><div class="lab">Ontology entities, data-bound</div></div>
+    <div class="kpi"><div class="num t">1</div><div class="lab">Copy of data, many experiences</div></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">The shift Fabric IQ delivers</h3>
+    <div class="flow">
+      <span class="box">Descriptive<br><small>reports</small></span><span class="arr">→</span>
+      <span class="box">Diagnostic<br><small>ontology graph</small></span><span class="arr">→</span>
+      <span class="box">Conversational<br><small>Data Agent</small></span><span class="arr">→</span>
+      <span class="box">Proactive<br><small>Activator alerts</small></span>
+    </div>
+    <p style="color:var(--muted);margin:14px 0 0">The same OneLake data and semantic model drive all four — no
+    copies, no re-modeling, no integration glue.</p>
+  </div>
+
+  <h3>Value highlights</h3>
+  <div class="grid cols-2">
+    <div class="card" style="margin:0">
+      <ul class="clean">
+        <li><b>One source of truth</b> — Lakehouse + Direct Lake means reports read live Delta tables with no import/refresh lag.</li>
+        <li><b>A shared business language</b> — the Ontology binds Store/Product/Customer/Order/Inventory to real tables, so humans and AI agents reason on the same definitions.</li>
+        <li><b>Self-service answers</b> — business users ask questions in plain English via the Data Agent instead of queuing report requests.</li>
+      </ul>
+    </div>
+    <div class="card" style="margin:0">
+      <ul class="clean">
+        <li><b>Insight → action</b> — the Activator turns a low-stock signal into an alert in someone's inbox automatically.</li>
+        <li><b>Governed &amp; trusted</b> — measures, relationships and security live once in the model, reused everywhere.</li>
+        <li><b>Fast to stand up</b> — the entire demo deploys code-first via the Fabric REST API in minutes, repeatable across tenants.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout note"><b>Who this is for:</b> account teams and partners running a Fabric IQ retail
+  demo, and customer architects who want a repeatable, end-to-end reference they can deploy in their own
+  environment.</div>
+</section>
+
+<!-- ===================== BUSINESS VALUE ===================== -->
+<section id="value" class="tab">
+  <h2 class="section">Business Value of Fabric IQ</h2>
+  <p class="lead">For business stakeholders: what does Fabric IQ actually change in this retail context, and
+  what's the payoff?</p>
+
+  <div class="card">
+    <h3 style="margin-top:0">Pain today → How Fabric IQ helps → Outcome</h3>
+    <table>
+      <thead><tr><th>Business pain</th><th>How Fabric IQ addresses it</th><th>Outcome / value</th></tr></thead>
+      <tbody>
+        <tr><td>Data scattered across POS, e-commerce, inventory systems</td><td>All entities land as Delta tables in <b>one Lakehouse (OneLake)</b></td><td>Single source of truth; no copy sprawl</td></tr>
+        <tr><td>Reports are stale; refreshes are slow/expensive</td><td><b>Direct Lake</b> reads the lakehouse live</td><td>Real-time numbers, lower capacity cost</td></tr>
+        <tr><td>Every team defines "revenue" differently</td><td>Measures &amp; relationships defined once in the <b>semantic model</b></td><td>Consistent, governed KPIs everywhere</td></tr>
+        <tr><td>AI tools don't understand the business</td><td><b>Ontology</b> gives entities + relationships a shared meaning</td><td>Trustworthy, context-aware AI answers</td></tr>
+        <tr><td>Analysts are a bottleneck for ad-hoc questions</td><td><b>Data Agent</b> answers natural-language questions</td><td>Self-service insight; analysts freed up</td></tr>
+        <tr><td>Stock-outs found too late, by hand</td><td><b>Operations Agent + Activator</b> watch and alert</td><td>Proactive action; fewer lost sales</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Capability → Persona → "So what?"</h3>
+    <table>
+      <thead><tr><th>Fabric IQ capability</th><th>Who benefits</th><th>Why they care</th></tr></thead>
+      <tbody>
+        <tr><td>Power BI report (Direct Lake)</td><td>Executives, Store Ops</td><td>Board-level pulse with zero refresh lag</td></tr>
+        <tr><td>Semantic model</td><td>BI / Analytics team</td><td>Model once, reuse across report + agents</td></tr>
+        <tr><td>Ontology (entity graph)</td><td>Data architects, AI teams</td><td>A living business model AI can reason over</td></tr>
+        <tr><td>Data Agent (NL Q&amp;A)</td><td>Category &amp; merch managers</td><td>Ask questions in English; no SQL or tickets</td></tr>
+        <tr><td>Operations Agent</td><td>Supply-chain / inventory</td><td>Surfaced operational insights, continuously</td></tr>
+        <tr><td>Activator (Reflex)</td><td>Store managers</td><td>Automated alerts → act before sales are lost</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Illustrative value drivers</h3>
+    <p style="color:var(--muted);margin-top:0">Directional, demo-context examples to anchor the conversation — replace with the customer's own baselines.</p>
+    <table>
+      <thead><tr><th>Lever</th><th>Mechanism in this demo</th><th>Illustrative impact</th></tr></thead>
+      <tbody>
+        <tr><td>Reduce stock-outs</td><td>Low-stock Activator alerts on <code class="inline">on_hand &lt; reorder_threshold</code></td><td>Recover lost-sale revenue on hero SKUs</td></tr>
+        <tr><td>Faster decisions</td><td>NL Data Agent replaces report backlog</td><td>Hours/week of analyst time returned</td></tr>
+        <tr><td>Lower BI cost</td><td>Direct Lake — no import/refresh pipelines</td><td>Less capacity + ETL to maintain</td></tr>
+        <tr><td>Trusted AI</td><td>Ontology grounds agents in governed data</td><td>Fewer wrong answers; higher adoption</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== ARCHITECTURE ===================== -->
+<section id="arch" class="tab">
+  <h2 class="section">Architecture Overview</h2>
+  <p class="lead">Everything below lives in a <b>single Fabric workspace</b> and shares <b>one copy of the data</b> in OneLake.</p>
+
+  <div class="card">
+    <div class="flow" style="gap:10px">
+      <span class="box">Synthetic data<br><small>generate_data.py</small></span><span class="arr">→</span>
+      <span class="box">Load notebook<br><small>PySpark</small></span><span class="arr">→</span>
+      <span class="box" style="border-color:var(--brand)">RetailLakehouse<br><small>6 Delta tables</small></span>
+    </div>
+    <div class="flow" style="gap:10px;margin-top:14px">
+      <span class="box" style="border-color:var(--brand)">Lakehouse</span><span class="arr">→ Direct Lake (SQL) →</span>
+      <span class="box">RetailSalesModel<br><small>measures + relationships</small></span><span class="arr">→</span>
+      <span class="box">RetailDemoReport<br><small>4 pages</small></span>
+    </div>
+    <div class="flow" style="gap:10px;margin-top:14px">
+      <span class="box" style="border-color:var(--teal)">RetailEventhouse<br><small>InventoryEvents (KQL)</small></span><span class="arr">↔</span>
+      <span class="box" style="border-color:var(--amber)">LowInventoryActivator<br><small>alert on threshold</small></span>
+    </div>
+    <div class="flow" style="gap:10px;margin-top:14px">
+      <span class="box" style="border-color:var(--brand2)">RetailOntology<br><small>+ GraphModel</small></span><span class="arr">→ grounds →</span>
+      <span class="box">Data Agent<br><small>NL Q&amp;A</small></span>
+      <span class="box">Operations Agent<br><small>monitoring</small></span>
+    </div>
+  </div>
+
+  <h3>Components &amp; dependencies</h3>
+  <div class="card">
+    <table>
+      <thead><tr><th>Component</th><th>Fabric item</th><th>Role</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr><td>Lakehouse</td><td><code class="inline">RetailLakehouse</code></td><td>Delta storage for all entities</td><td>—</td></tr>
+        <tr><td>Load notebook</td><td><code class="inline">Retail_LoadData</code></td><td>Generates + writes 6 Delta tables</td><td>Lakehouse</td></tr>
+        <tr><td>Eventhouse</td><td><code class="inline">RetailEventhouse</code> / <code class="inline">RetailEvents</code></td><td>Real-time low-stock / demand events</td><td>—</td></tr>
+        <tr><td>Semantic model</td><td><code class="inline">RetailSalesModel</code></td><td><b>Direct Lake on SQL</b>: relationships + measures</td><td>Lakehouse + SQL endpoint</td></tr>
+        <tr><td>Report</td><td><code class="inline">RetailDemoReport</code></td><td>4-page Power BI report</td><td>Semantic model</td></tr>
+        <tr><td>Ontology</td><td><code class="inline">RetailOntology</code> (+GraphModel)</td><td>Fabric IQ entity graph (data-bound)</td><td>Lakehouse tables</td></tr>
+        <tr><td>Activator</td><td><code class="inline">LowInventoryActivator</code></td><td>Alert on low inventory</td><td>Eventhouse / inventory</td></tr>
+        <tr><td>Data Agent</td><td>guided (preview SDK)</td><td>NL business Q&amp;A</td><td>Model + ontology</td></tr>
+        <tr><td>Operations Agent</td><td>guided (config)</td><td>Operational monitoring insights</td><td>Eventhouse + inventory</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Data model</h3>
+  <div class="card">
+    <table>
+      <thead><tr><th>Table</th><th>Grain</th><th>Key columns</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">stores</code></td><td>one row per store</td><td>store_id, name, city, province, type, open_date</td></tr>
+        <tr><td><code class="inline">products</code></td><td>one row per product</td><td>product_id, name, category, unit_price, cost</td></tr>
+        <tr><td><code class="inline">customers</code></td><td>one row per customer</td><td>customer_id, name, city, province, segment</td></tr>
+        <tr><td><code class="inline">orders</code></td><td>one row per order line</td><td>order_id, customer_id, store_id, product_id, qty, amount, channel</td></tr>
+        <tr><td><code class="inline">inventory</code></td><td>store × product</td><td>store_id, product_id, on_hand, reorder_threshold</td></tr>
+        <tr><td><code class="inline">events</code></td><td>one row per event</td><td>event_time, store_id, product_id, event_type, severity</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);margin-bottom:0"><b>Relationships:</b> Customer <i>places</i> Order · Order <i>at</i> Store ·
+    Order <i>contains</i> Product · Product <i>has</i> Inventory · Store <i>stocks</i> Inventory.</p>
+  </div>
+</section>
+
+<!-- ===================== STORYLINE ===================== -->
+<section id="story" class="tab">
+  <h2 class="section">Demo Storyline — "Maple &amp; Pine"</h2>
+  <p class="lead">A 4-act narrative that walks from <b>"what happened"</b> all the way to <b>"act automatically"</b>,
+  showing every Fabric IQ capability on one connected dataset.</p>
+
+  <div class="callout note"><b>Setup:</b> Maple &amp; Pine runs stores in Ontario, Québec, BC &amp; Alberta plus an
+  online channel. Revenue is healthy (~$106K, 350 orders) but the ops team keeps getting surprised by stock-outs.
+  Leadership wants <b>one connected view</b> — and wants to ask questions in plain English.</div>
+
+  <div class="card">
+    <div class="act">
+      <div class="who">Act 1 · Power BI Report</div>
+      <h4>"What happened?" — the executive pulse</h4>
+      <ul class="clean">
+        <li>Open <b>RetailDemoReport → Sales overview</b>: Total Sales, Avg Order Value, Units Sold, Online vs In-Store split.</li>
+        <li><b>Store performance:</b> rank provinces; see who pulls their weight.</li>
+        <li><b>Top products:</b> the hero SKUs driving the category mix.</li>
+        <li><i>Hook:</i> it's <b>Direct Lake</b> — no import, no refresh lag; it reads the lakehouse live.</li>
+      </ul>
+    </div>
+    <div class="act">
+      <div class="who">Act 2 · Fabric IQ Ontology</div>
+      <h4>"How is it all connected?" — the business model</h4>
+      <ul class="clean">
+        <li>Open <b>RetailOntology</b> and show the graph: Customer → places → Order → contains → Product → has → Inventory; Order → at → Store.</li>
+        <li>Each entity is <b>data-bound</b> to a real lakehouse table — a living model, not a diagram.</li>
+        <li><i>Message:</i> this is the shared language humans and AI agents both use.</li>
+      </ul>
+    </div>
+    <div class="act">
+      <div class="who">Act 3 · Data Agent</div>
+      <h4>"Just ask." — conversational analytics</h4>
+      <ul class="clean">
+        <li>Ask live: <i>"Which store has the highest revenue?"</i></li>
+        <li><i>"What are the top-selling products?"</i> · <i>"Which products are low in inventory right now?"</i></li>
+        <li><i>"What's the average order value for Online vs In-Store?"</i></li>
+        <li>It answers using the <b>same governed measures + ontology</b> behind the report — no SQL, no tickets.</li>
+      </ul>
+    </div>
+    <div class="act">
+      <div class="who">Act 4 · Operations Agent + Activator</div>
+      <h4>"Don't make me watch dashboards." — proactive action</h4>
+      <ul class="clean">
+        <li>Show the <b>InventoryEvents</b> stream in <b>RetailEventhouse</b> (low-stock + demand-spike events).</li>
+        <li>The <b>Operations Agent</b> surfaces "Product X at Store Y is below its reorder threshold."</li>
+        <li>The <b>LowInventoryActivator</b> turns that into action: <code class="inline">on_hand &lt; reorder_threshold</code> → alert the store manager.</li>
+      </ul>
+    </div>
+    <div class="callout tip"><b>Close:</b> Same OneLake data, one semantic model, one ontology — powering a report, a
+    conversational agent, and an automated alert. <b>That's Fabric IQ.</b></div>
+    <div class="callout warn"><b>Presenter tip:</b> just before the demo, lower one <code class="inline">on_hand</code>
+    value below its threshold so the Activator fires live during Act 4.</div>
+  </div>
+</section>
+
+<!-- ===================== VISUALS ===================== -->
+<section id="visuals" class="tab">
+  <h2 class="section">Sample Visuals</h2>
+  <p class="lead">Illustrative mock-ups of the report pages and the ontology graph (representative of the live
+  values: <b>$106,412 total sales, 350 orders</b>).</p>
+
+  <div class="grid cols-4">
+    <div class="kpi"><div class="num g">$106,412</div><div class="lab">Total Sales</div></div>
+    <div class="kpi"><div class="num b">350</div><div class="lab">Total Orders</div></div>
+    <div class="kpi"><div class="num v">$304</div><div class="lab">Avg Order Value</div></div>
+    <div class="kpi"><div class="num t">15</div><div class="lab">Low-Stock Items</div></div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="viz">
+      <h5>Sales by Store</h5>
+      <div class="bars">
+        <div class="bar"><b>$34K</b><div class="col" style="height:88%"></div><small>Toronto</small></div>
+        <div class="bar"><b>$28K</b><div class="col" style="height:72%"></div><small>Montréal</small></div>
+        <div class="bar"><b>$24K</b><div class="col" style="height:62%"></div><small>Vancouver</small></div>
+        <div class="bar"><b>$20K</b><div class="col" style="height:52%"></div><small>Calgary</small></div>
+      </div>
+    </div>
+    <div class="viz">
+      <h5>Channel Mix</h5>
+      <div class="donut">
+        <div class="ring"><span>62%</span></div>
+        <div class="legend">
+          <div><i style="background:var(--brand)"></i> In-Store &nbsp; <b>62%</b></div>
+          <div style="margin-top:8px"><i style="background:var(--teal)"></i> Online &nbsp; <b>38%</b></div>
+          <p style="margin-top:14px">Online over-indexes on hero SKUs and weekend demand spikes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="viz">
+      <h5>Top Products by Revenue</h5>
+      <div class="hbars">
+        <div class="row"><small>Maple Hoodie</small><div class="track"><div class="fill" style="width:92%"></div></div><b>$9.1K</b></div>
+        <div class="row"><small>Pine Backpack</small><div class="track"><div class="fill" style="width:80%"></div></div><b>$7.9K</b></div>
+        <div class="row"><small>Trail Boots</small><div class="track"><div class="fill" style="width:71%"></div></div><b>$7.0K</b></div>
+        <div class="row"><small>Wool Toque</small><div class="track"><div class="fill" style="width:58%"></div></div><b>$5.7K</b></div>
+        <div class="row"><small>Canvas Tote</small><div class="track"><div class="fill" style="width:44%"></div></div><b>$4.3K</b></div>
+      </div>
+    </div>
+    <div class="viz">
+      <h5>Inventory Status (low-stock watch)</h5>
+      <div class="hbars">
+        <div class="row"><small>P011 · Montréal</small><div class="track"><div class="fill" style="width:0%"></div></div><b style="color:var(--red)">0 ⚠</b></div>
+        <div class="row"><small>P002 · Vancouver</small><div class="track"><div class="fill" style="width:0%"></div></div><b style="color:var(--red)">0 ⚠</b></div>
+        <div class="row"><small>P007 · Calgary</small><div class="track"><div class="fill" style="background:var(--amber);width:33%"></div></div><b style="color:var(--amber)">5</b></div>
+        <div class="row"><small>P004 · Montréal</small><div class="track"><div class="fill" style="background:var(--amber);width:53%"></div></div><b style="color:var(--amber)">8</b></div>
+        <div class="row"><small>P020 · Toronto</small><div class="track"><div class="fill" style="width:100%"></div></div><b>140</b></div>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin:10px 0 0">Threshold = 15. Items below it trigger the Activator alert.</p>
+    </div>
+  </div>
+
+  <div class="viz">
+    <h5>Fabric IQ Ontology Graph</h5>
+    <div class="graph" id="graph">
+      <svg class="lines">
+        <line x1="20%" y1="50%" x2="42%" y2="50%"/>
+        <line x1="58%" y1="50%" x2="80%" y2="50%"/>
+        <line x1="50%" y1="58%" x2="50%" y2="82%"/>
+        <line x1="50%" y1="42%" x2="50%" y2="18%"/>
+        <line x1="80%" y1="50%" x2="50%" y2="82%"/>
+      </svg>
+      <div class="node alt" style="left:20%;top:50%">Customer</div>
+      <div class="node" style="left:50%;top:50%">Order</div>
+      <div class="node alt" style="left:80%;top:50%">Product</div>
+      <div class="node" style="left:50%;top:14%">Store</div>
+      <div class="node warn" style="left:50%;top:86%">Inventory</div>
+      <span class="edge" style="left:31%;top:46%">places</span>
+      <span class="edge" style="left:69%;top:46%">contains</span>
+      <span class="edge" style="left:53%;top:30%">at</span>
+      <span class="edge" style="left:46%;top:70%">has</span>
+      <span class="edge" style="left:68%;top:70%">stocks</span>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin:12px 0 0">5 entities · 5 relationships, each bound to a lakehouse table — the foundation the Data Agent reasons over.</p>
+  </div>
+</section>
+
+<!-- ===================== DEPLOYMENT ===================== -->
+<section id="deploy" class="tab">
+  <h2 class="section">Deployment Guide (step by step)</h2>
+  <p class="lead">Follow these to deploy the full demo into <b>your own</b> Fabric workspace. The deployment runs
+  independently against the Fabric REST API — no MCP runtime needed.</p>
+
+  <div class="callout note"><b>Prerequisites:</b> a Fabric-enabled workspace on an active capacity ·
+  contributor/admin rights · Python 3.10+ · the <code class="inline">Az</code> PowerShell module (for
+  <code class="inline">Connect-AzAccount</code>). For the AI-assisted authoring experience you'll also set up
+  <b>VS Code + GitHub Copilot + the Fabric Core MCP Server</b> (next section).</div>
+
+  <h3>Set up your AI authoring environment (VS Code + Copilot + Fabric MCP)</h3>
+  <p style="color:var(--muted);margin-top:0">This demo was built <b>code-first with the Fabric Core MCP server</b>
+  guiding the work — it discovers item schemas, validates definitions, and derives the correct creation order.
+  Set the same environment up so you (and Copilot) get accurate Fabric guidance while you build.</p>
+  <div class="steps">
+    <div class="step"><h4>Install Visual Studio Code</h4>
+      Download and install <a href="https://code.visualstudio.com/download" target="_blank">VS Code</a>
+      (Stable or Insiders). On Windows, also install <b>Node.js 20 LTS+</b> and <b>Python 3.10+</b> if you don't have them.
+    </div>
+    <div class="step"><h4>Add GitHub Copilot</h4>
+      Install the <b>GitHub Copilot</b> and <b>GitHub Copilot Chat</b> extensions from the VS Code Marketplace and
+      sign in with a GitHub account that has a Copilot license. Open the Chat view and confirm it responds.
+    </div>
+    <div class="step"><h4>Add the Fabric Core MCP Server (remote HTTP)</h4>
+      The Core server is a hosted endpoint — no local install. In VS Code:
+      <ul class="clean" style="margin-top:8px">
+        <li>Press <code class="inline">Ctrl+Shift+P</code> → <b>MCP: Add Server</b> → choose <b>HTTP</b>.</li>
+        <li>URL: <code class="inline">https://api.fabric.microsoft.com/v1/mcp/core</code></li>
+        <li>Name it <b>fabric</b>. VS Code opens a browser to sign in with your Microsoft Entra ID; the window closes when done.</li>
+      </ul>
+      <i>Or</i> add it manually to <code class="inline">.vscode/mcp.json</code>:
+      <pre>{
+  "servers": {
+    "fabric": {
+      "type": "http",
+      "url": "https://api.fabric.microsoft.com/v1/mcp/core"
+    }
+  }
+}</pre>
+    </div>
+    <div class="step"><h4>(Alternative) Local Fabric MCP Server via npx</h4>
+      Prefer a local server / a non-Copilot MCP client? With Node.js 20 LTS+ installed, add to your client's
+      <code class="inline">mcp.json</code>:
+      <pre>{
+  "mcpServers": {
+    "fabric-mcp-server": {
+      "command": "npx",
+      "args": ["-y","@microsoft/fabric-mcp@latest","server","start","--mode","all"]
+    }
+  }
+}</pre>
+      Or install the <b>Fabric MCP Server</b> VS Code extension, which registers it automatically.
+    </div>
+    <div class="step"><h4>Verify the MCP connection</h4>
+      In Copilot Chat, switch to <b>Agent</b> mode and confirm the <b>fabric</b> tools are listed (e.g. discover
+      item schemas / list workspaces). Now Copilot can ground its Fabric code in live schemas.
+    </div>
+  </div>
+
+  <div class="callout tip"><b>MCP is an authoring aid, not the runtime.</b> The MCP server helps you and Copilot
+  generate correct payloads and ordering. The actual deployment below runs independently against the Fabric REST
+  API — so the demo still deploys even on machines without MCP.</div>
+
+  <h3>Get the demo — pick a path</h3>
+  <p style="color:var(--muted);margin-top:0">Two ways to get the project onto your machine: <b>(A)</b> fork the
+  ready-made repo, or <b>(B)</b> "vibe-code" it from scratch with Copilot + the Fabric MCP server. Both end at the
+  same <b>Deploy the demo</b> steps below.</p>
+
+  <div class="grid cols-2">
+    <div class="card" style="margin:0">
+      <h4 style="margin-top:0">Path A · Fork &amp; clone the repo <span class="pill ok">fastest</span></h4>
+      <ol style="padding-left:18px;color:#cdd8f5">
+        <li>Open the source repo and click <b>Fork</b> (top-right) → creates a copy under your account/org:<br>
+          <a href="https://github.com/soocodes/fabric-mcp-core-demo" target="_blank">github.com/soocodes/fabric-mcp-core-demo</a></li>
+        <li>Clone <b>your fork</b> (swap <code class="inline">&lt;your-username&gt;</code>) and install dependencies:</li>
+      </ol>
+      <pre>git clone https://github.com/&lt;your-username&gt;/fabric-mcp-core-demo.git
+cd fabric-mcp-core-demo
+pip install -r deploy/requirements.txt
+
+# (optional) track the original repo to pull future updates
+git remote add upstream https://github.com/soocodes/fabric-mcp-core-demo.git</pre>
+      <p style="color:var(--muted);margin:8px 0 0;font-size:13.5px">Forking keeps your changes (workspace IDs,
+      data tweaks) in your own repo and makes it easy to pull upstream updates later.</p>
+    </div>
+    <div class="card" style="margin:0">
+      <h4 style="margin-top:0">Path B · Vibe-code it with Copilot + MCP <span class="pill prev">build from scratch</span></h4>
+      <p style="margin-top:0;color:#cdd8f5">No repo needed — let Copilot Agent generate it, grounded by the Fabric
+      MCP server you connected above.</p>
+      <ol style="padding-left:18px;color:#cdd8f5">
+        <li>Create an empty folder and <code class="inline">code .</code> to open it in VS Code.</li>
+        <li>Open <b>Copilot Chat → Agent mode</b>, ensure the <b>fabric</b> MCP tools are active.</li>
+        <li>Paste a prompt like the one below and let it scaffold the project, then iterate.</li>
+      </ol>
+      <pre>You are a senior Microsoft Fabric engineer.
+Use the Fabric MCP server to discover item schemas,
+validate definitions, and derive the correct creation
+order. Build a Retail Fabric IQ demo for workspace
+&lt;workspaceId&gt; with: a Lakehouse + synthetic data
+(stores, products, customers, orders, inventory,
+events), a Direct-Lake-on-SQL semantic model with
+measures, a 4-page Power BI report, a data-bound
+Ontology (Store, Product, Customer, Order, Inventory
++ relationships), an Eventhouse, and an Activator.
+Generate Python that deploys via the Fabric REST API
+(don't assume MCP is the runtime). Explain structure
+before writing code.</pre>
+      <p style="color:var(--muted);margin:8px 0 0;font-size:13.5px">MCP keeps Copilot honest about real Fabric item
+      schemas, so the generated payloads and creation order are correct.</p>
+    </div>
+  </div>
+
+  <div class="callout note"><b>Either path → same finish line.</b> Once you have the project locally
+  (forked or generated), continue with the deploy steps below. Path B users can also commit their generated code to
+  a new GitHub repo and <i>then</i> share it with their team like Path A.</div>
+
+  <h3>Deploy the demo</h3>
+
+  <div class="steps">
+    <div class="step"><h4>Confirm the project &amp; dependencies are in place</h4>
+      You should have the project folder locally (from Path A or B) with dependencies installed:
+      <pre>cd fabric-mcp-core-demo
+pip install -r deploy/requirements.txt</pre>
+    </div>
+    <div class="step"><h4>Set your target workspace</h4>
+      Edit <code class="inline">config/deploy.config.json</code> and set your <code class="inline">workspaceId</code>
+      (and optionally adjust data volumes: stores, products, customers, orders).
+    </div>
+    <div class="step"><h4>Authenticate to Fabric</h4>
+      <pre>Connect-AzAccount</pre>
+      Interactive sign-in. (For CI, use a service principal + a <code class="inline">FABRIC_TOKEN</code> env var.)
+    </div>
+    <div class="step"><h4>(Optional) preview the synthetic data locally</h4>
+      <pre>python data/generate_data.py</pre>
+    </div>
+    <div class="step"><h4>Deploy everything (ordered, dependency-aware)</h4>
+      <pre>python deploy/deploy.py</pre>
+      Creates the Lakehouse, runs the load notebook, builds the Direct-Lake-on-SQL semantic model, the report,
+      the Eventhouse, the data-bound Ontology, and the Activator. Item IDs are written to
+      <code class="inline">deploy_output.json</code>.
+    </div>
+    <div class="step"><h4>Or deploy phases selectively</h4>
+      <pre>python deploy/deploy.py --only lakehouse,data,semantic,report
+python deploy/deploy.py --only eventhouse
+python deploy/deploy.py --only activator,preview
+python deploy/deploy.py --skip eventhouse</pre>
+    </div>
+    <div class="step"><h4>Verify in the Fabric portal</h4>
+      Open your workspace — you should see <code class="inline">RetailLakehouse</code>,
+      <code class="inline">RetailSalesModel</code>, <code class="inline">RetailDemoReport</code> (with data),
+      <code class="inline">RetailEventhouse</code>, <code class="inline">RetailOntology</code> (5 entities), and
+      <code class="inline">LowInventoryActivator</code>.
+    </div>
+  </div>
+
+  <div class="callout tip"><b>Why Direct Lake on SQL?</b> Direct Lake <i>on OneLake</i> needs a bound OneLake
+  credential and renders blank when created headless. This demo uses Direct Lake <b>on the SQL endpoint</b> (SSO),
+  which deploys reliably and is verified returning <b>$106,412.12 / 350 orders</b>.</div>
+
+  <h3>What's automated vs. manual</h3>
+  <div class="card">
+    <table>
+      <thead><tr><th>Area</th><th>Status</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Lakehouse, data, semantic model, report, eventhouse, ontology, activator item</td><td><span class="pill ok">Automated</span></td><td>Deployed live via REST</td></tr>
+        <tr><td>Report data</td><td><span class="pill ok">Verified</span></td><td>$106,412.12 / 350 orders (Direct Lake on SQL)</td></tr>
+        <tr><td>KQL event seed</td><td><span class="pill warn">Manual</span></td><td>Run <code class="inline">eventhouse/setup.kql</code> once in a queryset</td></tr>
+        <tr><td>Activator alert rule</td><td><span class="pill warn">Manual</span></td><td>Set alert on the KQL query (no Eventstream needed)</td></tr>
+        <tr><td>Data Agent</td><td><span class="pill prev">Preview SDK</span></td><td>Create via <code class="inline">agents/data_agent_setup.py</code> in a notebook</td></tr>
+        <tr><td>Operations Agent</td><td><span class="pill prev">Preview</span></td><td>Apply <code class="inline">agents/operations_agent_config.yaml</code> in-product</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== MANUAL / FINISH ===================== -->
+<section id="manual" class="tab">
+  <h2 class="section">Finish &amp; Run the Demo</h2>
+  <p class="lead">After <code class="inline">deploy.py</code> completes, finish these preview/UI-only items
+  (~15–20 min). They have no headless API, so they're done once in the portal.</p>
+
+  <div class="steps">
+    <div class="step"><h4>Seed the Eventhouse data <span class="pill warn">required for Act 4</span></h4>
+      Open <b>RetailEvents</b> KQL database → <b>New queryset</b> → paste &amp; run
+      <code class="inline">eventhouse/setup.kql</code>. This creates &amp; seeds the
+      <code class="inline">InventoryEvents</code> table.
+    </div>
+    <div class="step"><h4>Create the Activator alert — on the Eventhouse query <span class="pill warn">required for Act 4</span></h4>
+      There is <b>no Eventstream</b> in this demo, so bind the alert directly to the KQL query:
+      <pre>InventoryEvents
+| where event_type in ('LowStock','StockOut')
+| where on_hand &lt; threshold</pre>
+      In the queryset ribbon click <b>Set alert</b> → check every few minutes → condition: <i>when the query returns rows</i> →
+      action: <i>email / Teams</i>. This creates (or reuses) the <code class="inline">LowInventoryActivator</code> Reflex.
+    </div>
+    <div class="step"><h4>Create the Data Agent <span class="pill prev">required for Act 3</span></h4>
+      New Fabric notebook → paste <code class="inline">agents/data_agent_setup.py</code> (preview
+      <code class="inline">fabric-data-agent</code> SDK) → run. Point it at <b>RetailSalesModel</b> +
+      <b>RetailOntology</b>, then test: <i>"Which store has the highest revenue?"</i>
+    </div>
+    <div class="step"><h4>Configure the Operations Agent <span class="pill info">optional</span></h4>
+      Apply the monitoring rules from <code class="inline">agents/operations_agent_config.yaml</code> in-product.
+    </div>
+    <div class="step"><h4>Pre-demo prep <span class="pill info">makes the alert fire live</span></h4>
+      Just before presenting, lower one <code class="inline">on_hand</code> value below its
+      <code class="inline">reorder_threshold</code> so the Activator fires during Act 4.
+    </div>
+  </div>
+
+  <div class="callout warn"><b>Why these are manual:</b> the KQL data-plane token isn't available headless, the
+  Reflex rule schema isn't stable for headless authoring, and the Data/Operations Agents are preview with no
+  public REST CRUD yet.</div>
+
+  <div class="callout note"><b>Suggested order:</b> 1 → 2 → 3 → 4 → 5. Steps 1–3 are the must-haves for a full
+  end-to-end run; 4–5 are polish.</div>
+</section>
+
+</main>
+
+<footer>
+  Retail Fabric IQ Demo Accelerator · Built code-first with the Fabric Core MCP server, deployed via the Fabric REST API.<br>
+  Share this file as-is — it's fully self-contained (no internet required). Use <b>Print → Save as PDF</b> for a handout.
+</footer>
+
+<script>
+  const tabs=document.querySelectorAll('nav.tabs button');
+  const secs=document.querySelectorAll('section.tab');
+  function go(id){
+    tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+    secs.forEach(s=>s.classList.toggle('active',s.id===id));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  tabs.forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+</script>
+</body>
+</html>

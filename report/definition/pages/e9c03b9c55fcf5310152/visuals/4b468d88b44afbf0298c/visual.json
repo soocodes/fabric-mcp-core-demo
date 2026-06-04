@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "4b468d88b44afbf0298c",
+  "position": {
+    "x": 620,
+    "y": 20,
+    "z": 2,
+    "height": 120,
+    "width": 280,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "inventory"
+                    }
+                  },
+                  "Property": "Inventory Health %"
+                }
+              },
+              "queryRef": "inventory.Inventory Health %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

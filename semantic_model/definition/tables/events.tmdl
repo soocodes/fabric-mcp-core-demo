@@ -1,0 +1,49 @@
+table events
+	lineageTag: tbl-events-0001
+
+	column event_time
+		dataType: string
+		lineageTag: col-events-event_time
+		summarizeBy: none
+		sourceColumn: event_time
+
+	column store_id
+		dataType: string
+		lineageTag: col-events-store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column product_id
+		dataType: string
+		lineageTag: col-events-product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column event_type
+		dataType: string
+		lineageTag: col-events-event_type
+		summarizeBy: none
+		sourceColumn: event_type
+
+	column severity
+		dataType: string
+		lineageTag: col-events-severity
+		summarizeBy: none
+		sourceColumn: severity
+
+	column message
+		dataType: string
+		lineageTag: col-events-message
+		summarizeBy: none
+		sourceColumn: message
+
+	measure 'Event Count' = COUNTROWS(events)
+		formatString: #,0
+		lineageTag: m-events-count
+
+	partition events = entity
+		mode: directLake
+		source
+			entityName: events
+			schemaName: dbo
+			expressionSource: DatabaseQuery

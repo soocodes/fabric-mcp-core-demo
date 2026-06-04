@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "13bba76e39ffb81b14a9",
+  "position": {
+    "x": 20,
+    "y": 20,
+    "z": 0,
+    "height": 120,
+    "width": 280,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "inventory"
+                    }
+                  },
+                  "Property": "Inventory On Hand"
+                }
+              },
+              "queryRef": "inventory.Inventory On Hand"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

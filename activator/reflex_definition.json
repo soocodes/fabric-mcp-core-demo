@@ -1,0 +1,65 @@
+[
+  {
+    "uniqueIdentifier": "10000000-0000-0000-0000-000000000001",
+    "payload": { "name": "Retail Inventory Monitor", "type": "samples" },
+    "type": "container-v1"
+  },
+  {
+    "uniqueIdentifier": "10000000-0000-0000-0000-000000000002",
+    "payload": {
+      "name": "Inventory simulator",
+      "runSettings": { "startTime": "2026-06-01T00:00:00Z", "stopTime": "2026-06-30T00:00:00Z" },
+      "version": "V2_0",
+      "type": "InventoryLevel",
+      "parentContainer": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000001" }
+    },
+    "type": "simulatorSource-v1"
+  },
+  {
+    "uniqueIdentifier": "10000000-0000-0000-0000-000000000003",
+    "payload": {
+      "name": "Inventory events",
+      "parentContainer": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000001" },
+      "definition": {
+        "type": "Event",
+        "instance": "{\"templateId\":\"SourceEvent\",\"templateVersion\":\"1.1\",\"steps\":[{\"name\":\"SourceEventStep\",\"id\":\"aaaa0001-0000-0000-0000-000000000001\",\"rows\":[{\"name\":\"SourceSelector\",\"kind\":\"SourceReference\",\"arguments\":[{\"name\":\"entityId\",\"type\":\"string\",\"value\":\"10000000-0000-0000-0000-000000000002\"}]}]}]}"
+      }
+    },
+    "type": "timeSeriesView-v1"
+  },
+  {
+    "uniqueIdentifier": "10000000-0000-0000-0000-000000000004",
+    "payload": {
+      "name": "InventoryItem",
+      "parentContainer": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000001" },
+      "definition": { "type": "Object" }
+    },
+    "type": "timeSeriesView-v1"
+  },
+  {
+    "uniqueIdentifier": "10000000-0000-0000-0000-000000000005",
+    "payload": {
+      "name": "OnHand",
+      "parentObject": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000004" },
+      "parentContainer": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000001" },
+      "definition": {
+        "type": "Attribute",
+        "instance": "{\"templateId\":\"BasicEventAttribute\",\"templateVersion\":\"1.1\",\"steps\":[{\"name\":\"EventSelectStep\",\"id\":\"cccc0001-0000-0000-0000-000000000001\",\"rows\":[{\"name\":\"EventSelector\",\"kind\":\"Event\",\"arguments\":[{\"kind\":\"EventReference\",\"type\":\"complex\",\"arguments\":[{\"name\":\"entityId\",\"type\":\"string\",\"value\":\"10000000-0000-0000-0000-000000000003\"}],\"name\":\"event\"}]},{\"name\":\"EventFieldSelector\",\"kind\":\"EventField\",\"arguments\":[{\"name\":\"fieldName\",\"type\":\"string\",\"value\":\"on_hand\"}]}]},{\"name\":\"EventComputeStep\",\"id\":\"dddd0001-0000-0000-0000-000000000001\",\"rows\":[{\"name\":\"TypeAssertion\",\"kind\":\"TypeAssertion\",\"arguments\":[{\"name\":\"op\",\"type\":\"string\",\"value\":\"Number\"},{\"name\":\"format\",\"type\":\"string\",\"value\":\"\"}]}]}]}"
+      }
+    },
+    "type": "timeSeriesView-v1"
+  },
+  {
+    "uniqueIdentifier": "10000000-0000-0000-0000-000000000006",
+    "payload": {
+      "name": "Low inventory alert",
+      "parentObject": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000004" },
+      "parentContainer": { "targetUniqueIdentifier": "10000000-0000-0000-0000-000000000001" },
+      "definition": {
+        "type": "Rule",
+        "instance": "{\"templateId\":\"AttributeTrigger\",\"templateVersion\":\"1.1\",\"description\":\"Fires when OnHand drops below the reorder threshold (15).\",\"steps\":[{\"name\":\"ScalarSelectStep\",\"id\":\"eeee0001-0000-0000-0000-000000000001\",\"rows\":[{\"name\":\"AttributeSelector\",\"kind\":\"Attribute\",\"arguments\":[{\"kind\":\"AttributeReference\",\"type\":\"complex\",\"arguments\":[{\"name\":\"entityId\",\"type\":\"string\",\"value\":\"10000000-0000-0000-0000-000000000005\"}],\"name\":\"attribute\"}]}]},{\"name\":\"ConditionStep\",\"id\":\"ffff0001-0000-0000-0000-000000000001\",\"rows\":[{\"name\":\"Comparison\",\"kind\":\"Comparison\",\"arguments\":[{\"name\":\"op\",\"type\":\"string\",\"value\":\"LessThan\"},{\"name\":\"value\",\"type\":\"number\",\"value\":\"15\"}]}]}]}"
+      }
+    },
+    "type": "timeSeriesView-v1"
+  }
+]

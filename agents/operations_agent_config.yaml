@@ -1,0 +1,43 @@
+# Operations Agent configuration — Retail Demo (preview / guided setup)
+# Operations Agent has no public REST/SDK provisioning API at this time, so this
+# file is a declarative spec used to configure it in the Fabric portal. It defines
+# the signals to monitor and the insights/actions to surface.
+
+name: RetailOperationsAgent
+description: >
+  Monitors inventory health and demand signals for the retail demo and surfaces
+  operational insights and recommended actions.
+
+monitors:
+  - id: low-inventory
+    source:
+      type: Lakehouse
+      name: RetailLakehouse
+      table: inventory
+    condition: "on_hand < reorder_threshold"
+    insight: "Product {product_id} at store {store_id} is below threshold ({on_hand} < {reorder_threshold})."
+    action: "Recommend restock / create purchase suggestion."
+    severity: Medium
+
+  - id: stock-out
+    source:
+      type: Eventhouse
+      name: RetailEventhouse
+      table: InventoryEvents
+    condition: "event_type == 'StockOut'"
+    insight: "Stock-out detected for {product_id} at {store_id}."
+    action: "Escalate to store manager; expedite replenishment."
+    severity: High
+
+  - id: demand-spike
+    source:
+      type: Eventhouse
+      name: RetailEventhouse
+      table: InventoryEvents
+    condition: "event_type == 'SalesSpike'"
+    insight: "Unusually high demand for {product_id} at {store_id}."
+    action: "Review safety stock; consider reallocation from other stores."
+    severity: Low
+
+schedule: "Every 15 minutes (demo: on-demand)"
+notificationChannel: "Activator -> Teams/email (see activator/reflex_definition.json)"

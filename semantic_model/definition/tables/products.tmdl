@@ -1,0 +1,45 @@
+table products
+	lineageTag: tbl-products-0001
+
+	column product_id
+		dataType: string
+		lineageTag: col-products-product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column name
+		dataType: string
+		lineageTag: col-products-name
+		summarizeBy: none
+		sourceColumn: name
+
+	column category
+		dataType: string
+		lineageTag: col-products-category
+		summarizeBy: none
+		sourceColumn: category
+
+	column unit_price
+		dataType: double
+		lineageTag: col-products-unit_price
+		summarizeBy: sum
+		sourceColumn: unit_price
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	column cost
+		dataType: double
+		lineageTag: col-products-cost
+		summarizeBy: sum
+		sourceColumn: cost
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Avg Unit Price' = AVERAGE(products[unit_price])
+		formatString: \$#,0.00
+		lineageTag: m-products-avgprice
+
+	partition products = entity
+		mode: directLake
+		source
+			entityName: products
+			schemaName: dbo
+			expressionSource: DatabaseQuery

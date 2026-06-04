@@ -1,0 +1,45 @@
+table stores
+	lineageTag: tbl-stores-0001
+
+	column store_id
+		dataType: string
+		lineageTag: col-stores-store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column name
+		dataType: string
+		lineageTag: col-stores-name
+		summarizeBy: none
+		sourceColumn: name
+
+	column city
+		dataType: string
+		lineageTag: col-stores-city
+		summarizeBy: none
+		sourceColumn: city
+
+	column province
+		dataType: string
+		lineageTag: col-stores-province
+		summarizeBy: none
+		sourceColumn: province
+
+	column type
+		dataType: string
+		lineageTag: col-stores-type
+		summarizeBy: none
+		sourceColumn: type
+
+	column open_date
+		dataType: string
+		lineageTag: col-stores-open_date
+		summarizeBy: none
+		sourceColumn: open_date
+
+	partition stores = entity
+		mode: directLake
+		source
+			entityName: stores
+			schemaName: dbo
+			expressionSource: DatabaseQuery

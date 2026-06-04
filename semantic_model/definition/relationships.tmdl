@@ -1,0 +1,27 @@
+relationship orders_customers
+	fromColumn: orders.customer_id
+	toColumn: customers.customer_id
+
+relationship orders_stores
+	fromColumn: orders.store_id
+	toColumn: stores.store_id
+
+relationship orders_products
+	fromColumn: orders.product_id
+	toColumn: products.product_id
+
+relationship inventory_stores
+	fromColumn: inventory.store_id
+	toColumn: stores.store_id
+
+relationship inventory_products
+	fromColumn: inventory.product_id
+	toColumn: products.product_id
+
+relationship events_stores
+	fromColumn: events.store_id
+	toColumn: stores.store_id
+
+relationship events_products
+	fromColumn: events.product_id
+	toColumn: products.product_id
