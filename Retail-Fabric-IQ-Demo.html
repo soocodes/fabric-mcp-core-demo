@@ -150,6 +150,7 @@
   <button data-tab="exec" class="active">Executive Summary</button>
   <button data-tab="value">Business Value</button>
   <button data-tab="arch">Architecture</button>
+  <button data-tab="ontology">Ontology Design</button>
   <button data-tab="story">Demo Storyline</button>
   <button data-tab="visuals">Sample Visuals</button>
   <button data-tab="deploy">Deployment Guide</button>
@@ -320,6 +321,133 @@
     <p style="color:var(--muted);margin-bottom:0"><b>Relationships:</b> Customer <i>places</i> Order · Order <i>at</i> Store ·
     Order <i>contains</i> Product · Product <i>has</i> Inventory · Store <i>stocks</i> Inventory.</p>
   </div>
+</section>
+
+<!-- ===================== ONTOLOGY DESIGN ===================== -->
+<section id="ontology" class="tab">
+  <h2 class="section">Ontology Design &amp; Definitions</h2>
+  <p class="lead">The <b>Fabric IQ ontology</b> is the semantic heart of the demo: a graph of business
+  <b>entity types</b> and <b>relationship types</b>, each <b>data-bound</b> to a real lakehouse table. It's the
+  shared language the Power BI model, the Data Agent, and the Operations Agent all reason over.</p>
+
+  <div class="grid cols-4">
+    <div class="kpi"><div class="num v">5</div><div class="lab">Entity types</div></div>
+    <div class="kpi"><div class="num t">5</div><div class="lab">Relationship types</div></div>
+    <div class="kpi"><div class="num b">21</div><div class="lab">Definition parts deployed</div></div>
+    <div class="kpi"><div class="num g">100%</div><div class="lab">Bound to lakehouse tables</div></div>
+  </div>
+
+  <div class="viz">
+    <h5>Entity graph (relationships)</h5>
+    <div class="graph">
+      <svg class="lines">
+        <line x1="20%" y1="50%" x2="42%" y2="50%"/>
+        <line x1="58%" y1="50%" x2="80%" y2="50%"/>
+        <line x1="50%" y1="58%" x2="50%" y2="82%"/>
+        <line x1="50%" y1="42%" x2="50%" y2="18%"/>
+        <line x1="80%" y1="50%" x2="50%" y2="82%"/>
+      </svg>
+      <div class="node alt" style="left:20%;top:50%">Customer</div>
+      <div class="node" style="left:50%;top:50%">Order</div>
+      <div class="node alt" style="left:80%;top:50%">Product</div>
+      <div class="node" style="left:50%;top:14%">Store</div>
+      <div class="node warn" style="left:50%;top:86%">Inventory</div>
+      <span class="edge" style="left:31%;top:46%">places</span>
+      <span class="edge" style="left:69%;top:46%">contains</span>
+      <span class="edge" style="left:53%;top:30%">atStore</span>
+      <span class="edge" style="left:45%;top:70%">hasInventory</span>
+      <span class="edge" style="left:69%;top:70%">holdsInventory</span>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin:12px 0 0">Customer <b>places</b> Order · Order
+    <b>contains</b> Product · Order <b>atStore</b> Store · Product <b>hasInventory</b> Inventory · Store
+    <b>holdsInventory</b> Inventory.</p>
+  </div>
+
+  <h3>Entity types &amp; data bindings</h3>
+  <div class="card">
+    <p style="margin-top:0;color:var(--muted)">Each entity binds to a lakehouse Delta table (via the SQL endpoint,
+    schema <code class="inline">dbo</code>). The <b>key</b> column(s) form the entity identity; properties map 1:1 to table columns.</p>
+    <table>
+      <thead><tr><th>Entity</th><th>Source table</th><th>Key</th><th>Properties (type)</th></tr></thead>
+      <tbody>
+        <tr><td><b>Store</b></td><td><code class="inline">stores</code></td><td>store_id</td><td>store_id (str), name (str), city (str), province (str), type (str)</td></tr>
+        <tr><td><b>Product</b></td><td><code class="inline">products</code></td><td>product_id</td><td>product_id (str), name (str), category (str), unit_price (double)</td></tr>
+        <tr><td><b>Customer</b></td><td><code class="inline">customers</code></td><td>customer_id</td><td>customer_id (str), name (str), segment (str), province (str)</td></tr>
+        <tr><td><b>Order</b></td><td><code class="inline">orders</code></td><td>order_id</td><td>order_id (str), qty (int), amount (double), channel (str), order_date (str)</td></tr>
+        <tr><td><b>Inventory</b></td><td><code class="inline">inventory</code></td><td><b>composite:</b> store_id + product_id</td><td>store_id (str), product_id (str), on_hand (int), reorder_threshold (int)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Relationship types &amp; contextualizations</h3>
+  <div class="card">
+    <p style="margin-top:0;color:var(--muted)">Relationships connect entity types and are <b>contextualized</b> to
+    the lakehouse table that holds both keys. Names match <code class="inline">^[a-zA-Z][\w-]{0,127}$</code> (no spaces).</p>
+    <table>
+      <thead><tr><th>Relationship</th><th>From → To</th><th>Card.</th><th>Binding table</th><th>Key mapping</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">places</code></td><td>Customer → Order</td><td>1:N</td><td>orders</td><td>customer_id → order_id</td></tr>
+        <tr><td><code class="inline">contains</code></td><td>Order → Product</td><td>N:1</td><td>orders</td><td>order_id → product_id</td></tr>
+        <tr><td><code class="inline">atStore</code></td><td>Order → Store</td><td>N:1</td><td>orders</td><td>order_id → store_id</td></tr>
+        <tr><td><code class="inline">hasInventory</code></td><td>Product → Inventory</td><td>1:N</td><td>inventory</td><td>product_id → (store_id, product_id)</td></tr>
+        <tr><td><code class="inline">holdsInventory</code></td><td>Store → Inventory</td><td>1:N</td><td>inventory</td><td>store_id → (store_id, product_id)</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:0"><b>Note:</b> Inventory has a composite key, so the
+    <code class="inline">hasInventory</code> / <code class="inline">holdsInventory</code> targets bind <i>two</i> columns.</p>
+  </div>
+
+  <h3>How it's defined &amp; deployed</h3>
+  <div class="grid cols-2">
+    <div class="card" style="margin:0">
+      <h4 style="margin-top:0">Source spec — <code class="inline">ontology/retail_ontology.json</code></h4>
+      <p style="color:var(--muted);margin-top:0">Human-readable design: entity types, property→column bindings, and relationships.</p>
+      <pre>{
+  "name": "RetailOntology",
+  "entityTypes": [
+    { "name": "Inventory",
+      "key": ["store_id","product_id"],
+      "sourceTable": "inventory",
+      "properties": [
+        {"name":"on_hand","type":"integer",
+         "column":"on_hand"},
+        {"name":"reorder_threshold",
+         "type":"integer",
+         "column":"reorder_threshold"} ] }
+  ],
+  "relationships": [
+    { "name":"ProductHasInventory",
+      "from":"Product","to":"Inventory",
+      "cardinality":"1:N",
+      "fromKey":"product_id",
+      "toKey":"product_id" }
+  ]
+}</pre>
+    </div>
+    <div class="card" style="margin:0">
+      <h4 style="margin-top:0">Builder — <code class="inline">deploy/ontology_builder.py</code></h4>
+      <p style="color:var(--muted);margin-top:0">Turns the spec into the Fabric <b>Ontology item definition</b> (21 parts)
+      and applies it via <code class="inline">create/updateDefinition</code>.</p>
+      <pre>definition.json                  # root ({})
+EntityTypes/{id}/definition.json # entity + props
+EntityTypes/{id}/DataBindings/
+        {guid}.json              # table binding
+RelationshipTypes/{id}/
+        definition.json          # source/target
+RelationshipTypes/{id}/
+   Contextualizations/{guid}.json# key bindings</pre>
+      <p style="color:var(--muted);font-size:13px;margin:8px 0 0">5 entity defs + 5 data bindings + 5 relationship
+      defs + 5 contextualizations + 1 root = <b>21 parts</b>.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><b>Why data-bound matters:</b> because every entity and relationship points at a real
+  lakehouse table, the ontology is a <i>living</i> model — the Data Agent answers <i>"which products are low in
+  inventory?"</i> by traversing Product → hasInventory → Inventory and reading the bound
+  <code class="inline">on_hand</code> / <code class="inline">reorder_threshold</code> columns, not a static diagram.</div>
+
+  <div class="callout note"><b>Design principles:</b> simple entities aligned 1:1 with the semantic model ·
+  string business keys · relationship names without spaces · one ontology = one governed vocabulary reused by report + agents.</div>
 </section>
 
 <!-- ===================== STORYLINE ===================== -->
